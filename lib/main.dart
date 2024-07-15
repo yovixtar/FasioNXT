@@ -1,3 +1,5 @@
+import 'package:fasionxt/views/home/home.dart';
+import 'package:fasionxt/views/layout_menu.dart';
 import 'package:fasionxt/views/splash/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Lato',
         useMaterial3: true,
       ),
-      home: SplashPage(),
+      home: LayoutMenu(),
     );
   }
 }

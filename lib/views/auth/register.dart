@@ -15,6 +15,10 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isRePasswordVisible = false;
   bool isLoading = false;
 
+  handleRegister() {
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,8 +141,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   },
                                 ),
                                 TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: !_isPasswordVisible,
+                                  controller: _repasswordController,
+                                  obscureText: !_isRePasswordVisible,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.lock, color: bgBlue),
                                     hintText: 'Konfirmasi Password',
@@ -168,34 +172,50 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                           SizedBox(height: 30),
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  (isLoading) ? null : null;
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: bluePrimary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 70,
-                                  vertical: 12,
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Image.asset(
+                                  "assets/images/icon-back.png",
+                                  width: 40,
+                                  height: 40,
                                 ),
                               ),
-                              child: (isLoading)
-                                  ? CircularProgressIndicator()
-                                  : Text(
-                                      'Register',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              Spacer(),
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      (isLoading) ? null : handleRegister();
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: bluePrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
                                     ),
-                            ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 70,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                  child: (isLoading)
+                                      ? CircularProgressIndicator()
+                                      : Text(
+                                          'Register',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                              Spacer(),
+                            ],
                           ),
                         ],
                       ),

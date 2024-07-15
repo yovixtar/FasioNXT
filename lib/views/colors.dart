@@ -12,3 +12,6 @@ const Color ancientRed = Color(0xFFE96E6E);
 
 const Color danger = Color(0xFFE23219);
 const Color success = Color(0xFF00C920);
+
+const Color bgGrey = Color(0xFFDFDCDC);
+const Color greyPrimary = Color(0xFF938F8F);

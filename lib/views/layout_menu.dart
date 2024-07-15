@@ -1,4 +1,5 @@
 import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/home/home.dart';
 import 'package:flutter/material.dart';
 
 class LayoutMenu extends StatefulWidget {
@@ -13,8 +14,7 @@ class LayoutMenu extends StatefulWidget {
 class _LayoutMenuState extends State<LayoutMenu> {
   int currentIndex = 0;
   List<Widget> screens = [
-    Scaffold(),
-    Scaffold(),
+    HomePage(),
     Scaffold(),
     Scaffold(),
   ];
@@ -28,7 +28,7 @@ class _LayoutMenuState extends State<LayoutMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgPurple,
+      backgroundColor: Colors.white,
       bottomNavigationBar: Container(
           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           decoration: BoxDecoration(
@@ -47,11 +47,10 @@ class _LayoutMenuState extends State<LayoutMenu> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildNavItem(Icons.home, "Home", 0),
-                _buildNavItem(Icons.food_bank_outlined, "Food", 1),
-                _buildNavItem(Icons.shopping_cart_outlined, "Cart", 2),
-                _buildNavItem(Icons.shopping_bag_outlined, "Shop", 3),
-                _buildNavItem(Icons.person, "Profile", 4),
+                _buildNavItem(Icons.home, 0),
+                _buildNavItem(Icons.notifications, 1),
+                _buildNavItem(Icons.shopping_cart, 2),
+                _buildNavItem(Icons.person, 4),
               ],
             ),
           )),
@@ -59,7 +58,7 @@ class _LayoutMenuState extends State<LayoutMenu> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(IconData icon, int index) {
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -86,15 +85,6 @@ class _LayoutMenuState extends State<LayoutMenu> {
                 color: currentIndex == index ? ancientRed : Colors.grey,
               ),
             ),
-            (currentIndex == index)
-                ? SizedBox()
-                : Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
-                  ),
           ],
         ),
       ),

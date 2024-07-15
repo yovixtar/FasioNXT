@@ -1,5 +1,6 @@
 import 'package:fasionxt/views/auth/register.dart';
 import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/layout_menu.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,6 +14,14 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   bool isLoading = false;
+
+  handleLogin() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => LayoutMenu(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: ElevatedButton(
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  (isLoading) ? null : null;
+                                  (isLoading) ? null : handleLogin();
                                 }
                               },
                               style: ElevatedButton.styleFrom(
