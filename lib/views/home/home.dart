@@ -4,6 +4,8 @@ import 'package:fasionxt/views/product/product_item.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -27,13 +29,13 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: const EdgeInsets.only(right: 16.0),
                       child: Image.asset(
-                        'assets/images/logo.png',
+                        'assets/images/icon-app.png',
                         width: 40,
                       ),
                     ),
                     Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
+                      padding: const EdgeInsets.only(right: 8.0),
                       child: ClipOval(
                         child: Image.asset(
                           'assets/images/icon-profile.jpeg',
@@ -117,12 +119,15 @@ class _HomePageState extends State<HomePage> {
                       alignment: WrapAlignment.start,
                       spacing: 20,
                       runSpacing: 10,
-                      children: List.generate(4, (index) {
-                        return Container(
-                          width: (MediaQuery.of(context).size.width / 2) - 30,
-                          child: ItemProduk(product: Product.example()),
-                        );
-                      }),
+                      children: List.generate(
+                        4,
+                        (index) {
+                          return Container(
+                            width: (MediaQuery.of(context).size.width / 2) - 30,
+                            child: ItemProduk(product: Product.example()),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

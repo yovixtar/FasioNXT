@@ -1,5 +1,7 @@
 import 'package:fasionxt/models/product.dart';
 import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/home/home.dart';
+import 'package:fasionxt/views/product/product_detail.dart';
 import 'package:flutter/material.dart';
 
 class ItemProduk extends StatefulWidget {
@@ -82,7 +84,15 @@ class _ItemProdukState extends State<ItemProduk> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ProductDetail(
+                                product: widget.product,
+                              ),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: bluePrimary,
                           shape: RoundedRectangleBorder(

@@ -1,6 +1,7 @@
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class LayoutMenu extends StatefulWidget {
   final int toPage;
@@ -17,6 +18,7 @@ class _LayoutMenuState extends State<LayoutMenu> {
     HomePage(),
     Scaffold(),
     Scaffold(),
+    Scaffold(),
   ];
 
   @override
@@ -29,32 +31,37 @@ class _LayoutMenuState extends State<LayoutMenu> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(35),
-              topLeft: Radius.circular(35),
-            ),
-            color: Colors.white,
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30.0),
-              topRight: Radius.circular(30.0),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildNavItem(Icons.home, 0),
-                _buildNavItem(Icons.notifications, 1),
-                _buildNavItem(Icons.shopping_cart, 2),
-                _buildNavItem(Icons.person, 4),
-              ],
-            ),
-          )),
+      bottomNavigationBar: _buildNavBar(),
       body: screens[currentIndex],
+    );
+  }
+
+  Widget _buildNavBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+      decoration: BoxDecoration(
+        // borderRadius: BorderRadius.only(
+        //   topRight: Radius.circular(35),
+        //   topLeft: Radius.circular(35),
+        // ),
+        color: Colors.white,
+      ),
+      child: ClipRRect(
+        // borderRadius: BorderRadius.only(
+        //   topLeft: Radius.circular(30.0),
+        //   topRight: Radius.circular(30.0),
+        // ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildNavItem(Icons.home, 0),
+            _buildNavItem(Icons.notifications, 1),
+            _buildNavItem(Icons.shopping_cart, 2),
+            _buildNavItem(Icons.person, 4),
+          ],
+        ),
+      ),
     );
   }
 
