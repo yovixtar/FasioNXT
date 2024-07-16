@@ -1,3 +1,4 @@
+import 'package:fasionxt/views/cart/cart_page.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/home/home.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class _LayoutMenuState extends State<LayoutMenu> {
   List<Widget> screens = [
     HomePage(),
     Scaffold(),
-    Scaffold(),
+    CartPage(),
     Scaffold(),
   ];
 
@@ -58,7 +59,7 @@ class _LayoutMenuState extends State<LayoutMenu> {
             _buildNavItem(Icons.home, 0),
             _buildNavItem(Icons.notifications, 1),
             _buildNavItem(Icons.shopping_cart, 2),
-            _buildNavItem(Icons.person, 4),
+            _buildNavItem(Icons.person, 3),
           ],
         ),
       ),
