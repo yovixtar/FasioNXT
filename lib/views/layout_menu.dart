@@ -1,6 +1,7 @@
 import 'package:fasionxt/views/cart/cart_page.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/home/home.dart';
+import 'package:fasionxt/views/notif/notif_list.dart';
 import 'package:fasionxt/views/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -18,7 +19,7 @@ class _LayoutMenuState extends State<LayoutMenu> {
   int currentIndex = 0;
   List<Widget> screens = [
     HomePage(),
-    Scaffold(),
+    NotificationListPage(),
     CartPage(),
     ProfilePage(),
   ];

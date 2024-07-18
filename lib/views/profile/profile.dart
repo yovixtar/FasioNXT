@@ -1,4 +1,8 @@
 import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/orders/order_list.dart';
+import 'package:fasionxt/views/profile/help_center.dart';
+import 'package:fasionxt/views/profile/setting_akun.dart';
+import 'package:fasionxt/views/profile/term_and_condition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -180,9 +184,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
+                      _buildShortcutMenu(Icons.payment, 'Belum Bayar'),
                       _buildShortcutMenu(Icons.all_inbox, 'Dikemas'),
-                      _buildShortcutMenu(Icons.history, 'History'),
-                      _buildShortcutMenu(Icons.payment, 'Pembayaran'),
+                      _buildShortcutMenu(Icons.local_shipping, 'Dikirim'),
                       _buildShortcutMenu(Icons.star, 'Penilaian'),
                     ],
                   ),
@@ -190,10 +194,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 20,
                   ),
-                  _buildProfileMenu(Icons.list_alt, 'Pesanan Saya'),
-                  _buildProfileMenu(Icons.favorite, 'Favorit Saya'),
-                  _buildProfileMenu(Icons.settings, 'Pengaturan Akun'),
-                  _buildProfileMenu(Icons.help, 'Pusat Bantuan'),
+                  _buildProfileMenu(
+                      Icons.list_alt, 'Pesanan Saya', OrderListPage()),
+                  _buildProfileMenu(Icons.favorite, 'Favorit Saya', Scaffold()),
+                  _buildProfileMenu(
+                      Icons.settings, 'Pengaturan Akun', AccountSettingsPage()),
+                  _buildProfileMenu(
+                      Icons.help, 'Pusat Bantuan', HelpCenterPage()),
                 ],
               ),
             ),
@@ -223,7 +230,11 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                // Terms and Conditions action
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => TermsAndConditionsPage(),
+                  ),
+                );
               },
               child: Text(
                 'Terms and Conditions',
@@ -256,16 +267,25 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileMenu(IconData icon, String label) {
-    return Column(
-      children: [
-        ListTile(
-          leading: Icon(icon),
-          title: Text(label),
-          trailing: Icon(Icons.arrow_forward_ios),
-        ),
-        Divider(),
-      ],
+  Widget _buildProfileMenu(IconData icon, String label, Widget page) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => page,
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(icon),
+            title: Text(label),
+            trailing: Icon(Icons.arrow_forward_ios),
+          ),
+          Divider(),
+        ],
+      ),
     );
   }
 }
