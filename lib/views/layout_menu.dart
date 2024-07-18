@@ -1,6 +1,7 @@
 import 'package:fasionxt/views/cart/cart_page.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/home/home.dart';
+import 'package:fasionxt/views/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -19,7 +20,7 @@ class _LayoutMenuState extends State<LayoutMenu> {
     HomePage(),
     Scaffold(),
     CartPage(),
-    Scaffold(),
+    ProfilePage(),
   ];
 
   @override
