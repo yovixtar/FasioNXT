@@ -1,11 +1,11 @@
-import 'package:fasionxt/models/product.dart';
+import 'package:fasionxt/models/produk.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/home/home.dart';
 import 'package:fasionxt/views/product/product_detail.dart';
 import 'package:flutter/material.dart';
 
 class ItemProduk extends StatefulWidget {
-  final Product product;
+  final Produk product;
 
   ItemProduk({required this.product});
 
@@ -32,8 +32,8 @@ class _ItemProdukState extends State<ItemProduk> {
                       borderRadius: BorderRadius.circular(15.0),
                       child: AspectRatio(
                         aspectRatio: 3 / 4,
-                        child: Image.asset(
-                          widget.product.image,
+                        child: Image.network(
+                          widget.product.gambar,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
@@ -66,13 +66,13 @@ class _ItemProdukState extends State<ItemProduk> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  widget.product.name,
+                  widget.product.nama,
                   style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(height: 4),
                 Text(
                   'Rp ' +
-                      widget.product.price.replaceAllMapped(
+                      widget.product.harga.replaceAllMapped(
                           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                           (Match m) => '${m[1]}.'),
                   style: TextStyle(

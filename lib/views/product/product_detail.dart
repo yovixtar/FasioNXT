@@ -1,4 +1,6 @@
-import 'package:fasionxt/models/product.dart';
+import 'dart:convert';
+
+import 'package:fasionxt/models/produk.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/layout_menu.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,7 @@ import 'package:flutter/material.dart';
 class ProductDetail extends StatefulWidget {
   const ProductDetail({super.key, required this.product});
 
-  final Product product;
+  final Produk product;
 
   @override
   _ProductDetailState createState() => _ProductDetailState();
@@ -16,6 +18,21 @@ class _ProductDetailState extends State<ProductDetail> {
   bool isLoading = false;
   bool isFavorite = false;
   int cartCount = 0;
+
+  late List<String> availableSizes;
+  late String selectedSize;
+
+  @override
+  void initState() {
+    super.initState();
+    availableSizes = _convertStringToList(widget.product.ukuran);
+    selectedSize = availableSizes.first; // Set default selected size
+  }
+
+  List<String> _convertStringToList(String sizeString) {
+    List<dynamic> sizeList = json.decode(sizeString);
+    return sizeList.map((size) => size.toString()).toList();
+  }
 
   void handleCart() {
     showOrderDialog(context, "Tambahkan Keranjang", handleAddToCart);
@@ -46,7 +63,6 @@ class _ProductDetailState extends State<ProductDetail> {
   void showOrderDialog(
       BuildContext context, String actionText, Function(int, String) onSubmit) {
     int quantity = 0;
-    String selectedSize = widget.product.sizes.first;
 
     showDialog(
       context: context,
@@ -79,7 +95,7 @@ class _ProductDetailState extends State<ProductDetail> {
                   Text("Pilih Ukuran Produk"),
                   DropdownButton<String>(
                     value: selectedSize,
-                    items: widget.product.sizes.map((String size) {
+                    items: availableSizes.map((String size) {
                       return DropdownMenuItem<String>(
                         value: size,
                         child: Text(size),
@@ -195,8 +211,8 @@ class _ProductDetailState extends State<ProductDetail> {
                               borderRadius: BorderRadius.circular(15.0),
                               child: AspectRatio(
                                 aspectRatio: 4 / 3,
-                                child: Image.asset(
-                                  widget.product.image,
+                                child: Image.network(
+                                  widget.product.gambar,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
@@ -212,14 +228,14 @@ class _ProductDetailState extends State<ProductDetail> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      widget.product.name,
+                                      widget.product.nama,
                                       style: TextStyle(
                                         fontSize: 24,
                                       ),
                                     ),
                                     Text(
                                       'Rp ' +
-                                          widget.product.price.replaceAllMapped(
+                                          widget.product.harga.replaceAllMapped(
                                               RegExp(
                                                   r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                                               (Match m) => '${m[1]}.') +
@@ -265,7 +281,7 @@ class _ProductDetailState extends State<ProductDetail> {
                               height: 20,
                             ),
                             Text(
-                              widget.product.description,
+                              widget.product.deskripsi,
                               style:
                                   TextStyle(color: greyPrimary, fontSize: 14),
                             ),

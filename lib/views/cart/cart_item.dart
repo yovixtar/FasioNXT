@@ -1,9 +1,9 @@
-import 'package:fasionxt/models/product.dart';
+import 'package:fasionxt/models/produk.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:flutter/material.dart';
 
 class ItemCart extends StatefulWidget {
-  final Product product;
+  final Produk product;
   final String jumlah;
   final String ukuran;
 
@@ -29,7 +29,7 @@ class _ItemCartState extends State<ItemCart> {
               child: AspectRatio(
                 aspectRatio: 5 / 6,
                 child: Image.asset(
-                  widget.product.image,
+                  widget.product.gambar,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -45,7 +45,7 @@ class _ItemCartState extends State<ItemCart> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.product.name,
+                  widget.product.nama,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                   style: TextStyle(
@@ -56,7 +56,7 @@ class _ItemCartState extends State<ItemCart> {
                 SizedBox(height: 4),
                 Text(
                   'Rp ' +
-                      widget.product.price.replaceAllMapped(
+                      widget.product.harga.replaceAllMapped(
                           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                           (Match m) => '${m[1]}.'),
                   style: TextStyle(

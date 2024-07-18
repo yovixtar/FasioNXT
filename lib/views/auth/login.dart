@@ -1,6 +1,9 @@
+import 'package:fasionxt/services/apis/auth.dart';
+import 'package:fasionxt/services/session.dart';
 import 'package:fasionxt/views/auth/register.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/layout_menu.dart';
+import 'package:fasionxt/views/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,12 +18,29 @@ class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
   bool isLoading = false;
 
-  handleLogin() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => LayoutMenu(),
-      ),
-    );
+  handleLogin() async {
+    setState(() {
+      isLoading = true;
+    });
+    final result = await APIUserService().login(
+        username: _usernameController.text, password: _passwordController.text);
+    if (result.containsKey('success')) {
+      if (await SessionManager.hasToken()) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const LayoutMenu(),
+          ),
+        );
+      } else {
+        SnackbarUtils.showErrorSnackbar(context, "Token gagal disimpan");
+      }
+    } else {
+      SnackbarUtils.showErrorSnackbar(context, result['error']);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override

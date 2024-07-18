@@ -1,3 +1,5 @@
+import 'package:fasionxt/services/session.dart';
+import 'package:fasionxt/views/auth/login.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/orders/order_list.dart';
 import 'package:fasionxt/views/profile/help_center.dart';
@@ -21,6 +23,59 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _loadPreferences();
+  }
+
+  void _showLogoutConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Konfirmasi'),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          content: Text('Apakah Anda yakin ingin logout?'),
+          actions: [
+            TextButton(
+              child: Text('Tidak'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: purplePrimary,
+              ),
+              child: Text(
+                'Ya, Logout',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _logout();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _logout() async {
+    await SessionManager.clearToken();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => LoginPage(),
+      ),
+    );
   }
 
   void _loadPreferences() async {
@@ -216,7 +271,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               onPressed: () {
-                // Log out action
+                _showLogoutConfirmation();
               },
               child: Text(
                 'Logout',

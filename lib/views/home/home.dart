@@ -1,18 +1,57 @@
-import 'package:fasionxt/models/product.dart';
+import 'package:flutter/material.dart';
+import 'package:fasionxt/models/kategori.dart';
+import 'package:fasionxt/models/produk.dart';
+import 'package:fasionxt/services/apis/kategori.dart';
+import 'package:fasionxt/services/apis/produk.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/product/product_item.dart';
-import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late Future<List<Kategori>> _dataKategori;
+  late Future<List<ProdukHome>> _dataProduk;
   String activeCategory = 'All';
-  final List<String> categories = ['All', 'Men', 'Women', 'Kids'];
+  String searchText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _dataKategori = fetchKategori();
+    _dataProduk = fetchProduk();
+  }
+
+  Future<List<Kategori>> fetchKategori() async {
+    List<Kategori> dataKategori = await APIKategoriService().getAllCategory();
+    return dataKategori;
+  }
+
+  Future<List<ProdukHome>> fetchProduk() async {
+    List<ProdukHome> dataProduk = await APIProdukService()
+        .getAllProductHome(); // Change this to fetch filtered products
+    return dataProduk;
+  }
+
+  List<ProdukHome> filterProducts(List<ProdukHome> products) {
+    if (activeCategory != 'All') {
+      products = products
+          .where((product) => product.produk.idKategori == activeCategory)
+          .toList();
+    }
+    if (searchText.isNotEmpty) {
+      products = products
+          .where((product) => product.produk.nama
+              .toLowerCase()
+              .contains(searchText.toLowerCase()))
+          .toList();
+    }
+    return products;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,62 +111,91 @@ class _HomePageState extends State<HomePage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      onSubmitted: (value) {
-                        print(value);
+                      onChanged: (value) {
+                        setState(() {
+                          searchText = value;
+                        });
                       },
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 20),
                     Container(
                       height: 40,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: categories.map((category) {
-                          bool isActive = category == activeCategory;
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  activeCategory = category;
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    isActive ? purplePrimary : bgGrey,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 30,
-                                  vertical: 5,
-                                ),
-                              ),
-                              child: Text(
-                                category,
-                                style: TextStyle(
-                                  color: isActive ? Colors.white : Colors.grey,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                      child: FutureBuilder<List<Kategori>>(
+                        future: _dataKategori,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            List<Kategori> kategoriList = [
+                                  Kategori(id: 'All', nama: 'Semua')
+                                ] +
+                                snapshot.data!;
+
+                            return ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: kategoriList.map((kategori) {
+                                bool isActive = kategori.id == activeCategory;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        activeCategory = kategori.id;
+                                      });
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          isActive ? purplePrimary : bgGrey,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 5),
+                                    ),
+                                    child: Text(
+                                      kategori.nama,
+                                      style: TextStyle(
+                                        color: isActive
+                                            ? Colors.white
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Error fetching categories');
+                          }
+                          return Center(child: CircularProgressIndicator());
+                        },
                       ),
                     ),
                     SizedBox(height: 10),
-                    Wrap(
-                      alignment: WrapAlignment.start,
-                      spacing: 20,
-                      runSpacing: 10,
-                      children: List.generate(
-                        4,
-                        (index) {
-                          return Container(
-                            width: (MediaQuery.of(context).size.width / 2) - 30,
-                            child: ItemProduk(product: Product.example()),
+                    FutureBuilder<List<ProdukHome>>(
+                      future: _dataProduk,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          List<ProdukHome> filteredProducts =
+                              filterProducts(snapshot.data!);
+                          return Wrap(
+                            alignment: WrapAlignment.start,
+                            spacing: 20,
+                            runSpacing: 10,
+                            children: filteredProducts.map((produk) {
+                              return Container(
+                                width: (MediaQuery.of(context).size.width / 2) -
+                                    30,
+                                child: ItemProduk(product: produk.produk),
+                              );
+                            }).toList(),
                           );
-                        },
-                      ),
+                        } else if (snapshot.hasError) {
+                          return Text(
+                              'Error fetching products ${snapshot.error}');
+                        }
+                        return Center(child: CircularProgressIndicator());
+                      },
                     ),
                   ],
                 ),

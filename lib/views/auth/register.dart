@@ -1,4 +1,7 @@
+import 'package:fasionxt/services/apis/auth.dart';
+import 'package:fasionxt/views/auth/login.dart';
 import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -15,8 +18,30 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isRePasswordVisible = false;
   bool isLoading = false;
 
-  handleRegister() {
-    Navigator.of(context).pop();
+  handleRegister() async {
+    setState(() {
+      isLoading = true;
+    });
+    final result = await APIUserService().register(
+      username: _usernameController.text,
+      password: _passwordController.text,
+    );
+    if (result.containsKey('success')) {
+      SnackbarUtils.showSuccessSnackbar(context, result['success']);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ),
+      );
+    } else {
+      setState(() {
+        SnackbarUtils.showErrorSnackbar(context, result['error']);
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override

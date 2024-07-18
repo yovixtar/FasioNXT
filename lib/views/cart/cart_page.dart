@@ -1,4 +1,4 @@
-import 'package:fasionxt/models/product.dart';
+import 'package:fasionxt/models/produk.dart';
 import 'package:fasionxt/views/cart/cart_item.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/payment/payment_view.dart';
@@ -82,10 +82,11 @@ class _CartPageState extends State<CartPage> {
                               ...List.generate(
                                 3,
                                 (index) {
-                                  return ItemCart(
-                                      product: Product.example(),
-                                      jumlah: "1",
-                                      ukuran: "L");
+                                  return SizedBox();
+                                  // return ItemCart(
+                                  //     product: Product.example(),
+                                  //     jumlah: "1",
+                                  //     ukuran: "L");
                                 },
                               ),
                             ],
