@@ -16,6 +16,7 @@ class _CartPageState extends State<CartPage> {
   bool isLoading = false;
   List<Map<String, dynamic>> cartItems = [];
   int shipping = 0;
+  int grandTotal = 0;
 
   @override
   void initState() {
@@ -150,6 +151,7 @@ class _CartPageState extends State<CartPage> {
                                 return Text("Error: ${snapshot.error}");
                               } else {
                                 int totalPrice = snapshot.data ?? 0;
+                                grandTotal = totalPrice + shipping;
                                 return Column(
                                   children: [
                                     Row(
@@ -267,6 +269,7 @@ class _CartPageState extends State<CartPage> {
                           MaterialPageRoute(
                             builder: (context) => OrderConfirmationPage(
                               cartItems: cartItems,
+                              total: grandTotal.toString(),
                             ),
                           ),
                         );

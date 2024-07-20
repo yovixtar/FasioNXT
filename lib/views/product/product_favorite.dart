@@ -1,5 +1,6 @@
 import 'package:fasionxt/models/produk.dart';
 import 'package:fasionxt/services/apis/produk.dart';
+import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/product/product_item.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,9 @@ class _ProdukFavoritPageState extends State<ProdukFavoritPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgLightRed,
       appBar: AppBar(
+        backgroundColor: bgLightRed,
         title: Text("Produk Favorit"),
       ),
       body: SingleChildScrollView(

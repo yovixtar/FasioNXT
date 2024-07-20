@@ -249,7 +249,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             );
                           } else if (snapshot.hasError) {
                             return Text(
-                                'Error fetching products ${snapshot.error}');
+                                'Error fetching profile ${snapshot.error}');
                           }
                           return Center(child: CircularProgressIndicator());
                         },

@@ -1,10 +1,18 @@
-import 'package:fasionxt/views/colors.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:fasionxt/models/pesanan.dart';
+import 'package:fasionxt/views/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 class PaymentViewPage extends StatefulWidget {
+  final Pesanan pesanan;
+  final List<Map<String, dynamic>> pesananItems;
+
+  PaymentViewPage(
+      {super.key, required this.pesanan, required this.pesananItems});
+
   @override
   _PaymentViewPageState createState() => _PaymentViewPageState();
 }
@@ -18,6 +26,7 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
   @override
   void initState() {
     super.initState();
+    print(widget.pesanan);
   }
 
   void _showDialogThanks(BuildContext context) {
@@ -122,6 +131,28 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
     webViewController.reload();
   }
 
+  Map<String, dynamic> _buildQueryParameters() {
+    List<String> productNames = [];
+    List<String> productImages = [];
+    List<String> productPrices = [];
+    List<String> productQuantities = [];
+
+    for (var item in widget.pesananItems) {
+      productNames.add(item['product']['nama']);
+      productImages.add(item['product']['gambar']);
+      productPrices.add(item['product']['harga'].toString());
+      productQuantities.add(item['quantity'].toString());
+    }
+
+    return {
+      'id_pesanan': widget.pesanan.id,
+      'product[]': productNames,
+      'qty[]': productQuantities,
+      'price[]': productPrices,
+      'imageUrl[]': productImages,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,15 +170,7 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
                 'Content-Type': 'application/x-www-form-urlencoded',
               },
               body: Uint8List.fromList(utf8.encode(Uri(
-                queryParameters: {
-                  'product[]': ['headset', 'softcase'],
-                  'qty[]': ['1', '3'],
-                  'price[]': ['100000', '20000'],
-                  'imageUrl[]': [
-                    'https://demo.ipaymu.com/assets/images/product-1.jpg',
-                    'https://demo.ipaymu.com/assets/images/product-2.jpg'
-                  ],
-                },
+                queryParameters: _buildQueryParameters(),
               ).query)),
             ),
             onWebViewCreated: (controller) {
