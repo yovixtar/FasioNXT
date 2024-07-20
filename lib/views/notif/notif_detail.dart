@@ -1,14 +1,12 @@
+import 'package:fasionxt/models/notifikasi.dart';
+import 'package:fasionxt/views/utils/format_utils.dart';
 import 'package:flutter/material.dart';
 
 class NotificationDetailPage extends StatelessWidget {
-  final String notificationTitle;
-  final String notificationDescription;
-  final String notificationDate;
+  final Notifikasi notification;
 
   NotificationDetailPage({
-    required this.notificationTitle,
-    required this.notificationDescription,
-    required this.notificationDate,
+    required this.notification,
   });
 
   @override
@@ -34,18 +32,18 @@ class NotificationDetailPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        notificationTitle,
+                        notification.judul,
                         style: TextStyle(
                             fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
                       Text(
-                        notificationDate,
+                        FormatUtils.formatTimestamp(notification.createdAt!),
                         style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                       SizedBox(height: 16),
                       Text(
-                        notificationDescription,
+                        notification.deskripsi,
                         style: TextStyle(fontSize: 18),
                       ),
                     ],

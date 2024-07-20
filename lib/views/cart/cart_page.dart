@@ -1,7 +1,8 @@
 import 'package:fasionxt/models/produk.dart';
+import 'package:fasionxt/services/cart_manager.dart';
 import 'package:fasionxt/views/cart/cart_item.dart';
 import 'package:fasionxt/views/colors.dart';
-import 'package:fasionxt/views/payment/payment_view.dart';
+import 'package:fasionxt/views/orders/order_confirm.dart';
 import 'package:flutter/material.dart';
 
 class CartPage extends StatefulWidget {
@@ -13,6 +14,43 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   bool isLoading = false;
+  List<Map<String, dynamic>> cartItems = [];
+  int shipping = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCart();
+  }
+
+  void _loadCart() async {
+    setState(() {
+      isLoading = true;
+    });
+    cartItems = await CartManager.getCart();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void _increaseQuantity(int index) async {
+    await CartManager.increaseQuantity(index);
+    _loadCart();
+  }
+
+  void _decreaseQuantity(int index) async {
+    await CartManager.decreaseQuantity(index);
+    _loadCart();
+  }
+
+  void _removeFromCart(int index) async {
+    await CartManager.removeFromCart(index);
+    _loadCart();
+  }
+
+  Future<int> _getTotalPrice() async {
+    return await CartManager.getTotalPrice();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +70,6 @@ class _CartPageState extends State<CartPage> {
           ),
         ),
         automaticallyImplyLeading: true,
-        // leading: IconButton(
-        //   onPressed: () {
-        //     Navigator.of(context).pop();
-        //   },
-        //   icon: Container(
-        //     padding: EdgeInsets.all(8),
-        //     decoration: BoxDecoration(
-        //       color: Colors.white,
-        //       borderRadius: BorderRadius.all(Radius.circular(50)),
-        //     ),
-        //     child: Icon(Icons.arrow_back_ios),
-        //   ),
-        // ),
         actions: [
           GestureDetector(
             onTap: () {},
@@ -67,9 +92,6 @@ class _CartPageState extends State<CartPage> {
           Positioned.fill(
             child: Column(
               children: [
-                SizedBox(
-                  height: 30,
-                ),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
@@ -79,14 +101,37 @@ class _CartPageState extends State<CartPage> {
                         children: [
                           Column(
                             children: [
+                              (cartItems.length == 0)
+                                  ? Center(
+                                      child:
+                                          Text("Yah Kosong, Mari Berbelanja !"),
+                                    )
+                                  : SizedBox(),
                               ...List.generate(
-                                3,
+                                cartItems.length,
                                 (index) {
-                                  return SizedBox();
-                                  // return ItemCart(
-                                  //     product: Product.example(),
-                                  //     jumlah: "1",
-                                  //     ukuran: "L");
+                                  return ItemCart(
+                                    product: Produk.fromJson(
+                                        cartItems[index]['product']),
+                                    jumlah:
+                                        cartItems[index]['quantity'].toString(),
+                                    ukuran: cartItems[index]['size'],
+                                    onDelete: () {
+                                      _removeFromCart(index);
+                                    },
+                                    onUpdate: (size) {
+                                      setState(() {
+                                        CartManager.updateSizeCart(index, size);
+                                        _loadCart();
+                                      });
+                                    },
+                                    onIncrease: () {
+                                      _increaseQuantity(index);
+                                    },
+                                    onDecrease: () {
+                                      _decreaseQuantity(index);
+                                    },
+                                  );
                                 },
                               ),
                             ],
@@ -94,82 +139,107 @@ class _CartPageState extends State<CartPage> {
                           SizedBox(
                             height: 30,
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                "Total :",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Spacer(),
-                              Text(
-                                'Rp. ' +
-                                    '100000'.replaceAllMapped(
-                                        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                        (Match m) => '${m[1]}.'),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                "Shipping :",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Spacer(),
-                              Text(
-                                'Rp. ' +
-                                    '0'.replaceAllMapped(
-                                        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                        (Match m) => '${m[1]}.'),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Divider(
-                            thickness: 2,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                "Grand Total :",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Spacer(),
-                              Text(
-                                'Rp ' +
-                                    '100000'.replaceAllMapped(
-                                        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                        (Match m) => '${m[1]}.'),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 80,
+                          FutureBuilder<int>(
+                            future: _getTotalPrice(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Text("Error: ${snapshot.error}");
+                              } else {
+                                int totalPrice = snapshot.data ?? 0;
+                                return Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Total :",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          'Rp. ' +
+                                              totalPrice
+                                                  .toString()
+                                                  .replaceAllMapped(
+                                                      RegExp(
+                                                          r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                                      (Match m) => '${m[1]}.'),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Shipping :",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          'Rp. ' +
+                                              shipping.toString().replaceAllMapped(
+                                                  RegExp(
+                                                      r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                                  (Match m) => '${m[1]}.'),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Divider(
+                                      thickness: 2,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Grand Total :",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          'Rp ' +
+                                              (totalPrice + shipping)
+                                                  .toString()
+                                                  .replaceAllMapped(
+                                                      RegExp(
+                                                          r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                                      (Match m) => '${m[1]}.'),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 80,
+                                    ),
+                                  ],
+                                );
+                              }
+                            },
                           ),
                         ],
                       ),
@@ -195,7 +265,9 @@ class _CartPageState extends State<CartPage> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => PaymentViewPage(),
+                            builder: (context) => OrderConfirmationPage(
+                              cartItems: cartItems,
+                            ),
                           ),
                         );
                       },

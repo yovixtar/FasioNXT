@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:fasionxt/models/produk.dart';
+import 'package:fasionxt/services/cart_manager.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/layout_menu.dart';
+import 'package:fasionxt/views/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetail extends StatefulWidget {
@@ -47,7 +49,9 @@ class _ProductDetailState extends State<ProductDetail> {
       cartCount += quantity;
     });
     Navigator.of(context).pop();
-    print('Jumlah: $quantity, Ukuran: $size');
+    CartManager.addToCart(widget.product, quantity, size);
+    SnackbarUtils.showSuccessSnackbar(
+        context, "Berhasil menambahkan produk ke Keranjang.");
   }
 
   void handleBuyNow(int quantity, String size) {
@@ -112,7 +116,9 @@ class _ProductDetailState extends State<ProductDetail> {
               actions: [
                 Center(
                   child: ElevatedButton(
-                    onPressed: () => onSubmit(quantity, selectedSize),
+                    onPressed: quantity > 0
+                        ? () => onSubmit(quantity, selectedSize)
+                        : null,
                     child: Text(
                       actionText,
                       style: TextStyle(color: Colors.white),
@@ -128,6 +134,10 @@ class _ProductDetailState extends State<ProductDetail> {
         );
       },
     );
+  }
+
+  Future<int> _getQuantityAllProduct() async {
+    return await CartManager.getQuantityAllProduct();
   }
 
   @override
@@ -153,7 +163,16 @@ class _ProductDetailState extends State<ProductDetail> {
           Stack(
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => LayoutMenu(
+                        toPage: 2,
+                      ),
+                    ),
+                  );
+                },
                 child: Icon(Icons.shopping_cart_outlined),
                 style: ElevatedButton.styleFrom(
                   shape: CircleBorder(),
@@ -162,17 +181,28 @@ class _ProductDetailState extends State<ProductDetail> {
                   foregroundColor: bluePrimary,
                 ),
               ),
-              Positioned(
-                right: 0,
-                child: CircleAvatar(
-                  radius: 10,
-                  backgroundColor: Colors.red,
-                  child: Text(
-                    '$cartCount',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-              ),
+              FutureBuilder<int>(
+                  future: _getQuantityAllProduct(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}");
+                    } else {
+                      int totalQuantity = snapshot.data ?? 0;
+                      return Positioned(
+                        right: 0,
+                        child: CircleAvatar(
+                          radius: 10,
+                          backgroundColor: Colors.red,
+                          child: Text(
+                            totalQuantity.toString(),
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      );
+                    }
+                  }),
             ],
           ),
         ],
