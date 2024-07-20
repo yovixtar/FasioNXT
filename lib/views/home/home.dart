@@ -32,8 +32,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<ProdukHome>> fetchProduk() async {
-    List<ProdukHome> dataProduk = await APIProdukService()
-        .getAllProductHome(); // Change this to fetch filtered products
+    List<ProdukHome> dataProduk = await APIProdukService().getAllProductHome();
     return dataProduk;
   }
 
@@ -186,7 +185,10 @@ class _HomePageState extends State<HomePage> {
                               return Container(
                                 width: (MediaQuery.of(context).size.width / 2) -
                                     30,
-                                child: ItemProduk(product: produk.produk),
+                                child: ItemProduk(
+                                  product: produk.produk,
+                                  isFavorite: produk.isFavorit,
+                                ),
                               );
                             }).toList(),
                           );

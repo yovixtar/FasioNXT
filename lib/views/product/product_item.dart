@@ -1,13 +1,15 @@
 import 'package:fasionxt/models/produk.dart';
+import 'package:fasionxt/services/apis/produk.dart';
 import 'package:fasionxt/views/colors.dart';
-import 'package:fasionxt/views/home/home.dart';
 import 'package:fasionxt/views/product/product_detail.dart';
+import 'package:fasionxt/views/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 
 class ItemProduk extends StatefulWidget {
   final Produk product;
+  final bool isFavorite;
 
-  ItemProduk({required this.product});
+  ItemProduk({required this.product, required this.isFavorite});
 
   @override
   _ItemProdukState createState() => _ItemProdukState();
@@ -15,6 +17,22 @@ class ItemProduk extends StatefulWidget {
 
 class _ItemProdukState extends State<ItemProduk> {
   bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.isFavorite;
+  }
+
+  handleFavorite() async {
+    final result =
+        await APIProdukService().favoritProduct(produk_id: widget.product.id);
+    if (result.containsKey('success')) {
+      SnackbarUtils.showSuccessSnackbar(context, result['success']);
+    } else {
+      SnackbarUtils.showErrorSnackbar(context, result['error']);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +65,7 @@ class _ItemProdukState extends State<ItemProduk> {
                           setState(() {
                             isFavorite = !isFavorite;
                           });
+                          handleFavorite();
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -89,6 +108,7 @@ class _ItemProdukState extends State<ItemProduk> {
                             MaterialPageRoute(
                               builder: (context) => ProductDetail(
                                 product: widget.product,
+                                isFavorite: isFavorite,
                               ),
                             ),
                           );

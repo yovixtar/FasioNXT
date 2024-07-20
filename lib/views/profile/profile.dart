@@ -1,7 +1,10 @@
+import 'package:fasionxt/models/pengguna.dart';
+import 'package:fasionxt/services/apis/profile.dart';
 import 'package:fasionxt/services/session.dart';
 import 'package:fasionxt/views/auth/login.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/orders/order_list.dart';
+import 'package:fasionxt/views/product/product_favorite.dart';
 import 'package:fasionxt/views/profile/help_center.dart';
 import 'package:fasionxt/views/profile/setting_akun.dart';
 import 'package:fasionxt/views/profile/term_and_condition.dart';
@@ -18,11 +21,18 @@ class _ProfilePageState extends State<ProfilePage> {
   Color _backgroundColor = Colors.blue;
   String _avatarPath = 'assets/images/avatar_1.jpg';
   late SharedPreferences _prefs;
+  late Future<Pengguna> _dataPengguna;
+
+  Future<Pengguna> fetchPengguna() async {
+    Pengguna dataPengguna = await APIProfileService().getCurrentUser();
+    return dataPengguna;
+  }
 
   @override
   void initState() {
     super.initState();
     _loadPreferences();
+    _dataPengguna = fetchPengguna();
   }
 
   void _showLogoutConfirmation() {
@@ -217,12 +227,32 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                       SizedBox(height: 8),
-                      Text(
-                        'Username',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      FutureBuilder<Pengguna>(
+                        future: _dataPengguna,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Column(
+                              children: [
+                                Text(
+                                  snapshot.data!.nama.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '@${snapshot.data!.username}',
+                                  style: TextStyle(
+                                      fontSize: 18, color: greyPrimary),
+                                ),
+                              ],
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text(
+                                'Error fetching products ${snapshot.error}');
+                          }
+                          return Center(child: CircularProgressIndicator());
+                        },
                       ),
                     ],
                   ),
@@ -230,7 +260,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             SizedBox(
-              height: 100,
+              height: 120,
             ),
             Padding(
               padding: EdgeInsets.all(20),
@@ -249,13 +279,31 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 20,
                   ),
-                  _buildProfileMenu(
-                      Icons.list_alt, 'Pesanan Saya', OrderListPage()),
-                  _buildProfileMenu(Icons.favorite, 'Favorit Saya', Scaffold()),
-                  _buildProfileMenu(
-                      Icons.settings, 'Pengaturan Akun', AccountSettingsPage()),
-                  _buildProfileMenu(
-                      Icons.help, 'Pusat Bantuan', HelpCenterPage()),
+                  FutureBuilder<Pengguna>(
+                    future: _dataPengguna,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Column(
+                          children: [
+                            _buildProfileMenu(Icons.list_alt, 'Pesanan Saya',
+                                OrderListPage()),
+                            _buildProfileMenu(Icons.favorite, 'Favorit Saya',
+                                ProdukFavoritPage()),
+                            _buildProfileMenu(
+                                Icons.settings,
+                                'Pengaturan Akun',
+                                AccountSettingsPage(
+                                  pengguna: snapshot.data!,
+                                )),
+                            _buildProfileMenu(
+                                Icons.help, 'Pusat Bantuan', HelpCenterPage()),
+                          ],
+                        );
+                      }
+                      ;
+                      return Center(child: CircularProgressIndicator());
+                    },
+                  ),
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:fasionxt/models/produk.dart';
+import 'package:fasionxt/services/apis/produk.dart';
 import 'package:fasionxt/services/cart_manager.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/layout_menu.dart';
@@ -8,9 +9,11 @@ import 'package:fasionxt/views/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetail extends StatefulWidget {
-  const ProductDetail({super.key, required this.product});
+  const ProductDetail(
+      {super.key, required this.product, required this.isFavorite});
 
   final Produk product;
+  final bool isFavorite;
 
   @override
   _ProductDetailState createState() => _ProductDetailState();
@@ -24,11 +27,22 @@ class _ProductDetailState extends State<ProductDetail> {
   late List<String> availableSizes;
   late String selectedSize;
 
+  handleFavorite() async {
+    final result =
+        await APIProdukService().favoritProduct(produk_id: widget.product.id);
+    if (result.containsKey('success')) {
+      SnackbarUtils.showSuccessSnackbar(context, result['success']);
+    } else {
+      SnackbarUtils.showErrorSnackbar(context, result['error']);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     availableSizes = _convertStringToList(widget.product.ukuran);
-    selectedSize = availableSizes.first; // Set default selected size
+    selectedSize = availableSizes.first;
+    isFavorite = widget.isFavorite;
   }
 
   List<String> _convertStringToList(String sizeString) {
@@ -283,6 +297,7 @@ class _ProductDetailState extends State<ProductDetail> {
                                     setState(() {
                                       isFavorite = !isFavorite;
                                     });
+                                    handleFavorite();
                                   },
                                   child: Container(
                                     padding: EdgeInsets.all(10),
