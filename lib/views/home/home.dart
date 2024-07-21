@@ -1,3 +1,4 @@
+import 'package:fasionxt/views/layout_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:fasionxt/models/kategori.dart';
 import 'package:fasionxt/models/produk.dart';
@@ -75,11 +76,22 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/icon-profile.jpeg',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => LayoutMenu(
+                                  toPage: 3,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/images/icon-profile.jpeg',
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),

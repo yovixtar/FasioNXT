@@ -82,7 +82,9 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => OrderListPage(),
+                              builder: (context) => OrderListPage(
+                                toTab: 1,
+                              ),
                             ),
                           );
                         },

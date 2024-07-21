@@ -192,7 +192,8 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                         ? null
                         : isCompleate
                             ? handleCheckout()
-                            : null;
+                            : SnackbarUtils.showErrorSnackbar(
+                                context, 'Mohon lengkapi Profile Anda!');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: bluePrimary,
