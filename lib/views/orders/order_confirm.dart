@@ -1,6 +1,7 @@
 import 'package:fasionxt/models/pengguna.dart';
 import 'package:fasionxt/services/apis/pesanan.dart';
 import 'package:fasionxt/services/apis/profile.dart';
+import 'package:fasionxt/services/cart_manager.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/layout_menu.dart';
 import 'package:fasionxt/views/payment/payment_view.dart';
@@ -44,6 +45,8 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
       total: widget.total,
       items: widget.cartItems,
     );
+
+    CartManager.clearCart();
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -185,12 +188,11 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    isCompleate ? handleCheckout() : null;
-                    // Navigator.of(context).pushReplacement(
-                    //   MaterialPageRoute(
-                    //     builder: (context) => Scaffold(),
-                    //   ),
-                    // );
+                    isLoading
+                        ? null
+                        : isCompleate
+                            ? handleCheckout()
+                            : null;
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: bluePrimary,
@@ -202,14 +204,16 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
                       vertical: 12,
                     ),
                   ),
-                  child: Text(
-                    'Bayar',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: (isLoading)
+                      ? CircularProgressIndicator()
+                      : Text(
+                          'Bayar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ],

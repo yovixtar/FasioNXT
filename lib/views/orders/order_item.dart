@@ -1,12 +1,20 @@
+import 'package:fasionxt/models/pesanan.dart';
+import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/orders/order_detail.dart';
 import 'package:fasionxt/views/orders/order_recipt.dart';
+import 'package:fasionxt/views/utils/format_utils.dart';
 import 'package:flutter/material.dart';
 
-class OrderItemCard extends StatelessWidget {
-  final String status;
+class OrderItemCard extends StatefulWidget {
+  final DaftarPesanan pesanan;
 
-  OrderItemCard({required this.status});
+  OrderItemCard({super.key, required this.pesanan});
 
+  @override
+  _OrderItemCardState createState() => _OrderItemCardState();
+}
+
+class _OrderItemCardState extends State<OrderItemCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -19,35 +27,46 @@ class OrderItemCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Order #12345',
+              'Pesanan #${widget.pesanan.idPesanan}',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            Text('3 items - \$75.00', style: TextStyle(fontSize: 16)),
+            Text(
+                '${widget.pesanan.items.length} Produk - Rp ' +
+                    widget.pesanan.total.replaceAllMapped(
+                        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                        (Match m) => '${m[1]}.'),
+                style: TextStyle(fontSize: 16)),
             SizedBox(height: 8),
             Row(
               children: [
                 Icon(Icons.calendar_today, size: 16),
                 SizedBox(width: 4),
-                Text('July 15, 2024'),
+                Text(FormatUtils.formatTanggal(widget.pesanan.tanggal)),
                 Spacer(),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      backgroundColor: purplePrimary),
                   onPressed: () {
                     // Navigate to detail page
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => (status != "Selesai")
-                            ? OrderDetailPage(status: status)
-                            : EReceiptPage(),
+                        builder: (context) =>
+                            (widget.pesanan.status.toLowerCase() != "selesai")
+                                ? OrderDetailPage(pesanan: widget.pesanan)
+                                : EReceiptPage(
+                                    pesanan: widget.pesanan,
+                                  ),
                       ),
                     );
                   },
-                  child: Text('View Details'),
+                  child: Text(
+                    'View Details',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),

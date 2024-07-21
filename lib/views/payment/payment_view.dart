@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:fasionxt/models/pesanan.dart';
+import 'package:fasionxt/services/notification.dart';
 import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/orders/order_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -78,6 +80,11 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
                         onPressed: () {
                           Navigator.of(context).pop();
                           Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => OrderListPage(),
+                            ),
+                          );
                         },
                         child: Text(
                           'Continue',
@@ -182,6 +189,10 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
                 hasError = false;
               });
               if (url.toString().contains('thanks.php')) {
+                LocalNotificationService.display(
+                  'Pembayaran Berhasil',
+                  'Pembayaran Anda telah berhasil. Pesanan Anda sedang dikemas.',
+                );
                 _showDialogThanks(context);
               }
             },

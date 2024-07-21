@@ -269,10 +269,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildShortcutMenu(Icons.payment, 'Belum Bayar'),
-                      _buildShortcutMenu(Icons.all_inbox, 'Dikemas'),
-                      _buildShortcutMenu(Icons.local_shipping, 'Dikirim'),
-                      _buildShortcutMenu(Icons.star, 'Penilaian'),
+                      _buildShortcutMenu(Icons.payment, 'Belum Bayar', 0),
+                      _buildShortcutMenu(Icons.all_inbox, 'Dikemas', 1),
+                      _buildShortcutMenu(Icons.local_shipping, 'Dikirim', 2),
+                      _buildShortcutMenu(Icons.star, 'Selesai', 3),
                     ],
                   ),
                   Divider(),
@@ -360,13 +360,24 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildShortcutMenu(IconData icon, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 30),
-        SizedBox(height: 4),
-        Text(label),
-      ],
+  Widget _buildShortcutMenu(IconData icon, String label, int indexTab) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OrderListPage(
+              toTab: indexTab,
+            ),
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          Icon(icon, size: 30),
+          SizedBox(height: 4),
+          Text(label),
+        ],
+      ),
     );
   }
 

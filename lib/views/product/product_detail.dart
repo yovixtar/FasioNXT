@@ -73,7 +73,6 @@ class _ProductDetailState extends State<ProductDetail> {
       cartCount += quantity;
     });
     Navigator.of(context).pop();
-    print('Jumlah: $quantity, Ukuran: $size');
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (_) => LayoutMenu(toPage: 1)));
   }
@@ -106,7 +105,11 @@ class _ProductDetailState extends State<ProductDetail> {
                       Text('$quantity'),
                       IconButton(
                         icon: Icon(Icons.add),
-                        onPressed: () => setState(() => quantity++),
+                        onPressed: quantity < int.parse(widget.product.stok)
+                            ? () {
+                                setState(() => quantity++);
+                              }
+                            : null,
                       ),
                     ],
                   ),

@@ -1,10 +1,19 @@
+import 'package:fasionxt/models/pesanan.dart';
+import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/utils/format_utils.dart';
 import 'package:flutter/material.dart';
 
 class EReceiptPage extends StatelessWidget {
+  final DaftarPesanan pesanan;
+
+  EReceiptPage({required this.pesanan});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgBlue,
       appBar: AppBar(
+        backgroundColor: bgBlue,
         title: Text('Riwayat Transaksi'),
       ),
       body: SingleChildScrollView(
@@ -69,10 +78,12 @@ class EReceiptPage extends StatelessWidget {
                     1: FlexColumnWidth(3),
                   },
                   children: [
-                    _buildTableRow('Nama:', 'John Doe'),
-                    _buildTableRow('Alamat:', 'Jl. Merdeka No. 123'),
-                    _buildTableRow('Tanggal:', '15 Juli 2024'),
-                    _buildTableRow('Metode Pembayaran:', 'Kartu Kredit'),
+                    _buildTableRow('Nama:', pesanan.namaPengguna),
+                    _buildTableRow('Alamat:', pesanan.alamat),
+                    _buildTableRow('Tanggal:',
+                        FormatUtils.formatTimestamp(pesanan.tanggal)),
+                    _buildTableRow('Metode Pembayaran:',
+                        pesanan.metodePembayaran.toUpperCase()),
                   ],
                 ),
                 SizedBox(height: 16),
@@ -84,8 +95,12 @@ class EReceiptPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16),
-                _buildProductCard('Produk A', 2, 50000),
-                _buildProductCard('Produk B', 1, 75000),
+                ...pesanan.items.map(
+                  (produk) {
+                    return _buildProductCard(produk.namaProduk, produk.gambar,
+                        produk.jumlah, produk.harga);
+                  },
+                ),
                 SizedBox(height: 16),
                 Divider(),
                 Row(
@@ -99,7 +114,10 @@ class EReceiptPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Rp. 125,000',
+                      'Rp. ' +
+                          pesanan.total.replaceAllMapped(
+                              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                              (Match m) => '${m[1]}.'),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -136,7 +154,8 @@ class EReceiptPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProductCard(String name, int quantity, int price) {
+  Widget _buildProductCard(
+      String name, String image, String quantity, String price) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -145,8 +164,8 @@ class EReceiptPage extends StatelessWidget {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            Image.asset(
-              'assets/images/product-ex.jpeg',
+            Image.network(
+              image,
               height: 50,
               width: 50,
             ),
@@ -167,7 +186,12 @@ class EReceiptPage extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                   ),
                   Text(
-                    'Rp. ${(quantity * price).toString()}',
+                    'Rp. ' +
+                        (int.parse(quantity) * int.parse(price))
+                            .toString()
+                            .replaceAllMapped(
+                                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                (Match m) => '${m[1]}.'),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

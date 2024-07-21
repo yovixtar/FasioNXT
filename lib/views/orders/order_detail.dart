@@ -1,14 +1,56 @@
+import 'package:fasionxt/models/pesanan.dart';
+import 'package:fasionxt/services/apis/pesanan.dart';
+import 'package:fasionxt/views/colors.dart';
+import 'package:fasionxt/views/orders/order_list.dart';
+import 'package:fasionxt/views/utils/format_utils.dart';
+import 'package:fasionxt/views/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 
-class OrderDetailPage extends StatelessWidget {
-  final String status;
+class OrderDetailPage extends StatefulWidget {
+  final DaftarPesanan pesanan;
 
-  OrderDetailPage({required this.status});
+  OrderDetailPage({required this.pesanan});
+  @override
+  _OrderDetailPageState createState() => _OrderDetailPageState();
+}
+
+class _OrderDetailPageState extends State<OrderDetailPage> {
+  bool isLoading = false;
+
+  handleSelesaiPesanan() async {
+    setState(() {
+      isLoading = true;
+    });
+    final result = await APIPesananService().selesaiPesanan(
+      id_pesanan: widget.pesanan.idPesanan,
+    );
+    if (result.containsKey('success')) {
+      SnackbarUtils.showSuccessSnackbar(context, result['success']);
+      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => OrderListPage(
+            toTab: 3,
+          ),
+        ),
+      );
+    } else {
+      setState(() {
+        SnackbarUtils.showErrorSnackbar(context, result['error']);
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: bgBlue,
       appBar: AppBar(
+        backgroundColor: bgBlue,
         title: Text('Detail Pesanan'),
       ),
       body: SingleChildScrollView(
@@ -18,24 +60,36 @@ class OrderDetailPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Pesanan #12345',
+                'Pesanan #${widget.pesanan.idPesanan}',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
-              Text('3 item - Rp 1.125.000', style: TextStyle(fontSize: 20)),
+              Text(
+                  '${widget.pesanan.items.length} item - Rp ' +
+                      widget.pesanan.total.replaceAllMapped(
+                          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                          (Match m) => '${m[1]}.'),
+                  style: TextStyle(fontSize: 20)),
               SizedBox(height: 16),
               Divider(),
               ListTile(
                 leading: Icon(Icons.local_shipping),
-                title: status == 'Dikemas'
-                    ? Text('Status: Menunggu dikirim')
+                title: widget.pesanan.status.toLowerCase() == 'dikemas'
+                    ? Text('Status: Packing, Menunggu dikirim')
                     : Text('Status: Dikirim'),
-                subtitle: status == 'Dikirim'
+                subtitle: widget.pesanan.status.toLowerCase() == 'dikirim'
                     ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: purplePrimary),
                         onPressed: () {
-                          // Mark as completed
+                          isLoading ? null : handleSelesaiPesanan();
                         },
-                        child: Text('Selesaikan Pesanan'),
+                        child: (isLoading)
+                            ? CircularProgressIndicator()
+                            : Text(
+                                'Selesaikan Pesanan',
+                                style: TextStyle(color: Colors.white),
+                              ),
                       )
                     : null,
               ),
@@ -45,6 +99,13 @@ class OrderDetailPage extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),
+              Text(
+                widget.pesanan.catatan,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 16),
               Text('Informasi Kustomer:',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
@@ -54,20 +115,22 @@ class OrderDetailPage extends StatelessWidget {
                   1: FlexColumnWidth(3),
                 },
                 children: [
-                  _buildTableRow('Nama:', 'John Doe'),
-                  _buildTableRow('Alamat:', 'Jl. Merdeka No. 123'),
-                  _buildTableRow('Tanggal:', '15 Juli 2024'),
-                  _buildTableRow('Metode Pembayaran:', 'Kartu Kredit'),
+                  _buildTableRow('Nama:', widget.pesanan.namaPengguna),
+                  _buildTableRow('Alamat:', widget.pesanan.alamat),
+                  _buildTableRow('Tanggal:',
+                      FormatUtils.formatTimestamp(widget.pesanan.tanggal)),
+                  _buildTableRow('Metode Pembayaran:',
+                      widget.pesanan.metodePembayaran.toUpperCase()),
                 ],
               ),
               SizedBox(height: 16),
               Text('Informasi Produk:',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
-              _buildProductCard(
-                  'Item 1', 'assets/images/product-ex.jpeg', 1, 375000),
-              _buildProductCard(
-                  'Item 2', 'assets/images/product-ex.jpeg', 2, 375000),
+              ...widget.pesanan.items.map((produk) {
+                return _buildProductCard(produk.namaProduk, produk.gambar,
+                    produk.jumlah, produk.harga);
+              }),
               SizedBox(height: 16),
               Divider(),
               Row(
@@ -76,7 +139,11 @@ class OrderDetailPage extends StatelessWidget {
                   Text('Total:',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text('Rp 1.125.000',
+                  Text(
+                      'Rp ' +
+                          widget.pesanan.total.replaceAllMapped(
+                              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                              (Match m) => '${m[1]}.'),
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
@@ -110,8 +177,9 @@ class OrderDetailPage extends StatelessWidget {
   }
 
   Widget _buildProductCard(
-      String name, String imagePath, int quantity, int price) {
+      String name, String imagePath, String quantity, String price) {
     return Card(
+      color: bgGrey,
       elevation: 3,
       margin: EdgeInsets.symmetric(vertical: 5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -119,7 +187,7 @@ class OrderDetailPage extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
-            Image.asset(
+            Image.network(
               imagePath,
               height: 50,
               width: 50,
@@ -144,7 +212,11 @@ class OrderDetailPage extends StatelessWidget {
               ),
             ),
             Text(
-              'Rp ${(quantity * price).toString()}',
+              'Rp ' +
+                  (int.parse(quantity) * int.parse(price))
+                      .toString()
+                      .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                          (Match m) => '${m[1]}.'),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

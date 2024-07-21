@@ -1,3 +1,4 @@
+import 'package:fasionxt/services/notification.dart';
 import 'package:fasionxt/services/session.dart';
 import 'package:fasionxt/views/auth/login.dart';
 import 'package:fasionxt/views/colors.dart';
@@ -19,6 +20,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   void initState() {
     super.initState();
+    LocalNotificationService.initialize();
     _controller = AnimationController(
       duration: const Duration(seconds: 3),
       vsync: this,
