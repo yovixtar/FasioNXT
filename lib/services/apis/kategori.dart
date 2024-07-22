@@ -15,7 +15,7 @@ class APIKategoriService {
     if (responseData['code'] == 200) {
       var data = responseData['data'] as List;
       List<Kategori> kategories =
-          data.map((bus) => Kategori.fromJson(bus)).toList();
+          data.map((kategori) => Kategori.fromJson(kategori)).toList();
       return kategories;
     } else {
       return [];
