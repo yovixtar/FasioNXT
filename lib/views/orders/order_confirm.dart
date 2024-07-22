@@ -10,16 +10,21 @@ import 'package:flutter/material.dart';
 
 class OrderConfirmationPage extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
+  final Map<String, dynamic>? directItem;
   final String total;
 
   const OrderConfirmationPage(
-      {super.key, required this.cartItems, required this.total});
+      {super.key,
+      required this.cartItems,
+      required this.total,
+      this.directItem});
 
   @override
   _OrderConfirmationPageState createState() => _OrderConfirmationPageState();
 }
 
 class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
+  List<Map<String, dynamic>> items = [];
   final _catatanController = TextEditingController(text: "");
   bool isCompleate = false;
   bool isLoading = false;
@@ -34,6 +39,10 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
   void initState() {
     super.initState();
     _dataPengguna = fetchPengguna();
+    items = widget.cartItems;
+    if (widget.directItem != null) {
+      items.add(widget.directItem!);
+    }
   }
 
   handleCheckout() async {
@@ -158,7 +167,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
               Text('Informasi Produk:',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               SizedBox(height: 8),
-              ...widget.cartItems.map((item) {
+              ...items.map((item) {
                 return _buildProductCard(
                     item['product']['nama'],
                     item['product']['gambar'],

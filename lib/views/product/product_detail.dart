@@ -5,6 +5,7 @@ import 'package:fasionxt/services/apis/produk.dart';
 import 'package:fasionxt/services/cart_manager.dart';
 import 'package:fasionxt/views/colors.dart';
 import 'package:fasionxt/views/layout_menu.dart';
+import 'package:fasionxt/views/orders/order_confirm.dart';
 import 'package:fasionxt/views/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -69,12 +70,21 @@ class _ProductDetailState extends State<ProductDetail> {
   }
 
   void handleBuyNow(int quantity, String size) {
-    setState(() {
-      cartCount += quantity;
-    });
     Navigator.of(context).pop();
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => LayoutMenu(toPage: 1)));
+    Map<String, dynamic> directItem = {
+      'product': widget.product.toJson(),
+      'quantity': quantity,
+      'size': size,
+    };
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => OrderConfirmationPage(
+          cartItems: [],
+          directItem: directItem,
+          total: (int.parse(widget.product.harga) * quantity).toString(),
+        ),
+      ),
+    );
   }
 
   void showOrderDialog(

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:fasionxt/config.dart';
 import 'package:fasionxt/models/notifikasi.dart';
-import 'package:fasionxt/models/produk.dart';
 import 'package:fasionxt/services/session.dart';
 import 'package:http/http.dart' as http;
 
